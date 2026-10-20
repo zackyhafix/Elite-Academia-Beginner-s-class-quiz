@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grammar Quiz</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#46178f;--card:#fff;--text:#1d1d1d;--on:#fff;--r:#e21b3c;--b:#1368ce;--y:#d89e00;--g:#26890c}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a0e57;--card:#2f2f3a;--text:#f2f2f2}}
+:root[data-theme="dark"]{--bg:#2a0e57;--card:#2f2f3a;--text:#f2f2f2}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--on);font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:720px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px;min-height:100vh}
+h1{font-size:clamp(28px,7vw,44px);margin:8px 0;text-align:center}
+.sub{text-align:center;opacity:.9;margin:0}
+.card{background:var(--card);color:var(--text);border-radius:12px;padding:18px;text-align:center}
+input{width:100%;font-size:20px;padding:14px;border-radius:8px;border:3px solid #ddd;text-align:center;font-family:inherit;background:#fff;color:#1d1d1d}
+button{font-family:inherit;cursor:pointer;border:0;color:#fff;font-weight:700}
+.mode{display:block;width:100%;padding:16px;font-size:18px;border-radius:10px;margin-top:10px;box-shadow:0 5px 0 rgba(0,0,0,.3);text-align:left}
+.mode small{display:block;font-weight:400;opacity:.9;margin-top:2px}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:700;gap:8px}
+.pill{background:rgba(0,0,0,.3);padding:6px 12px;border-radius:20px}
+.bar{height:12px;background:rgba(255,255,255,.25);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:#fff;transition:width .1s linear}
+.q{font-size:clamp(20px,5vw,28px);font-weight:700;min-height:100px;display:flex;align-items:center;justify-content:center}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ans button{min-height:96px;font-size:clamp(15px,4vw,20px);border-radius:10px;padding:10px;box-shadow:0 5px 0 rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;text-align:left}
+.ans button b{font-size:26px;flex:none}
+.ans button.dim{opacity:.35}
+.ans button.ok{outline:5px solid #fff}
+.c0{background:var(--r)}.c1{background:var(--b)}.c2{background:var(--y)}.c3{background:var(--g)}
+.go{background:#1d1d1d;padding:14px 28px;border-radius:10px;font-size:18px;margin:0 auto;display:block;box-shadow:0 4px 0 rgba(0,0,0,.4)}
+.res{padding:14px;border-radius:12px;text-align:center;font-weight:700;font-size:20px}
+.good{background:var(--g)}.bad{background:var(--r)}
+.big{font-size:56px;font-weight:800;margin:6px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const MC=[
+["Which word is a noun?",["run","happy","teacher","quickly"],2],
+["I eat ___ apple every day.",["a","an","some","much"],1],
+["I have ___ water in my bottle.",["many","a few","a little","an"],2],
+["Maria is my sister. ___ is a nurse.",["He","She","It","We"],1],
+["Which sentence has the correct adjective order?",["a red big ball","a big red ball","big a red ball","red a big ball"],1],
+["Tom and I are friends. ___ play football together.",["We","They","Us","Our"],0],
+["Which noun is uncountable?",["chair","information","book","egg"],1],
+["That book is not yours. It is ___.",["my","mine","me","I"],1],
+["She bought a ___ dress.",["silk red beautiful","beautiful red silk","red beautiful silk","silk beautiful red"],1],
+["The film was ___ boring. I almost fell asleep.",["extremely","many","few","a"],0],
+["There are ___ seats left, so we can all sit.",["few","a few","little","a little"],1],
+["I need ___ advice about my homework.",["an","a","some","many"],2],
+["I made this cake by ___. Nobody helped me.",["me","my","myself","mine"],2],
+["They live in a ___ house.",["brick old big","big old brick","old big brick","brick big old"],1],
+["The water is ___ freezing!",["very","absolutely","a little","rather"],1],
+["He is ___ honest man.",["a","an","the","no article"],1],
+["She goes to ___ university in Boston.",["a","an","the","no article"],0],
+["She wore a ___ scarf.",["Italian silk lovely long","lovely long Italian silk","long lovely silk Italian","silk Italian long lovely"],1],
+["Between you and ___, the test was very hard.",["I","me","my","mine"],1],
+["Which sentence is correct?",["I have too much homeworks.","She gave me a few advices.","There are fewer people than yesterday.","How much students came?"],2]
+];
+const TF=[
+["“Teacher” is a noun.",1],
+["We use “an” before a word that starts with a vowel sound.",1],
+["“She” is a pronoun used for a man.",0],
+["“A big old house” has the correct adjective order.",1],
+["“Very” is an intensifier.",1],
+["We use “much” with countable nouns, like “much books”.",0],
+["“Water” is a countable noun.",0],
+["“The” can be used with both singular and plural nouns.",1],
+["“Mine” is a possessive pronoun.",1],
+["“A red big car” is the correct adjective order.",0],
+["“Few” and “a few” have the same meaning.",0],
+["We can say “very perfect”.",0],
+["“Myself” is a reflexive pronoun.",1],
+["We say “an hour” because “hour” starts with a vowel sound.",1],
+["In OSASCOMP, origin comes before material.",1],
+["“Between you and me” is correct.",1],
+["“Furniture” is uncountable, so we say “furnitures”.",0],
+["In OSASCOMP, color comes before shape.",0],
+["We use “fewer” with countable nouns and “less” with uncountable nouns.",1],
+["“Every students” is correct.",0]
+];
+const BN=[
+["Nouns & Articles: Which sentence uses articles correctly?",["She is an European with an MBA degree.","She is a European with a MBA degree.","She is a European with an MBA degree.","She is an European with a MBA degree."],2],
+["Pronouns: Which sentence is correct?",["Him and I are responsible for the project ourselves.","She taught herself to code, and the success was all hers.","Me and my brother built it by ourself.","The decision was theirs, but they blamed theirselves."],1],
+["Adjective Order: He inherited a ___ table.",["small lovely antique round brown Spanish wooden dining","lovely small antique round brown Spanish wooden dining","lovely small round antique brown Spanish wooden dining","lovely small antique round Spanish brown wooden dining"],1],
+["Intensifiers & Quantifiers: Which sentence is correct?",["The movie was very fantastic, and fewer people came than expected.","The soup was absolutely delicious, and hardly any of it was left.","There was a great deal of people, so we had less chairs.","It was extremely impossible to find much seats."],1]
+];
+const MODES=[
+{k:"mc",n:"Multiple Choice",d:"20 questions, easy to very hard",c:"c1",qs:MC.map((x,i)=>({q:x[0],o:x[1],a:x[2],t:i<5?20:i<15?30:45}))},
+{k:"tf",n:"True or False",d:"20 statements, easy to very hard",c:"c3",qs:TF.map((x,i)=>({q:x[0],o:["True","False"],a:x[1]?0:1,t:i<5?10:i<10?15:20}))},
+{k:"bn",n:"Very Very Hard Bonus",d:"4 brain-busters, one per topic",c:"c0",qs:BN.map(x=>({q:x[0],o:x[1],a:x[2],t:60}))}
+];
+const SH=["▲","◆","●","■"];
+const app=document.getElementById("app");
+let name="",S=null,tm=null;
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+function home(){
+ clearInterval(tm);
+ app.innerHTML=`<h1>🎮 Grammar Quiz</h1>
+ <p class="sub">Nouns & Articles · Pronouns · Adjective Order · Intensifiers & Quantifiers</p>
+ <div class="card"><input id="nm" maxlength="20" placeholder="Enter your nickname" value="${esc(name)}">
+ ${MODES.map((m,i)=>`<button class="mode ${m.c}" data-i="${i}">${m.n}<small>${m.d}</small></button>`).join("")}</div>`;
+ app.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{
+  const v=document.getElementById("nm").value.trim();
+  if(!v){document.getElementById("nm").style.borderColor="#e21b3c";document.getElementById("nm").focus();return}
+  name=v;start(+b.dataset.i)});
+}
+function start(i){S={m:MODES[i],i:0,score:0,right:0,streak:0};show()}
+function show(){
+ const q=S.m.qs[S.i],n=S.m.qs.length,tf=q.o.length==2,cols=tf?[1,0]:[0,1,2,3],shp=tf?[1,3]:[0,1,2,3];
+ S.t0=Date.now();S.done=false;
+ app.innerHTML=`<div class="top"><span class="pill">${S.i+1} / ${n}</span><span class="pill" id="tl">${q.t}</span><span class="pill">${S.score} pts</span></div>
+ <div class="bar"><i id="bf"></i></div>
+ <div class="card q">${esc(q.q)}</div>
+ <div class="ans">${q.o.map((o,k)=>`<button class="c${cols[k]}" data-k="${k}"><b>${SH[shp[k]]}</b><span>${esc(o)}</span></button>`).join("")}</div>
+ <div id="fb"></div>`;
+ app.querySelectorAll(".ans button").forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+ clearInterval(tm);
+ tm=setInterval(()=>{
+  const el=(Date.now()-S.t0)/1000,left=Math.max(0,q.t-el);
+  document.getElementById("bf").style.width=(left/q.t*100)+"%";
+  document.getElementById("tl").textContent=Math.ceil(left);
+  if(left<=0)pick(-1);
+ },100);
+}
+function pick(k){
+ if(S.done)return;S.done=true;clearInterval(tm);
+ const q=S.m.qs[S.i],el=(Date.now()-S.t0)/1000,ok=k===q.a;let pts=0;
+ if(ok){pts=Math.round(1000*(1-(el/q.t)/2));S.score+=pts;S.right++;S.streak++}else S.streak=0;
+ app.querySelectorAll(".ans button").forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add("ok");else b.classList.add("dim")});
+ const last=S.i==S.m.qs.length-1;
+ document.getElementById("fb").innerHTML=`<div class="res ${ok?"good":"bad"}">${k<0?"⏰ Time’s up!":ok?"✓ Correct! +"+pts:"✗ Incorrect"}${ok&&S.streak>1?" · 🔥 "+S.streak+" in a row":""}</div>
+ <button class="go" id="nx" style="margin-top:12px">${last?"See results":"Next"}</button>`;
+ document.getElementById("nx").onclick=()=>{if(last)end();else{S.i++;show()}};
+}
+function end(){
+ const n=S.m.qs.length,p=Math.round(S.right/n*100);
+ const msg=p==100?"Perfect! 🏆":p>=80?"Great job! 🌟":p>=60?"Good effort! 👍":"Keep practicing! 💪";
+ app.innerHTML=`<h1>${msg}</h1><div class="card"><div>${esc(name)} · ${S.m.n}</div>
+ <div class="big">${S.score}</div><div>points</div>
+ <p>${S.right} of ${n} correct (${p}%)</p></div>
+ <button class="go" id="ag">Play again</button><button class="go" id="hm" style="background:#fff;color:#1d1d1d">Other quizzes</button>`;
+ document.getElementById("ag").onclick=()=>start(MODES.indexOf(S.m));
+ document.getElementById("hm").onclick=home;
+}
+home();
+</script>
+</body>
+</html>
